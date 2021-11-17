@@ -1,0 +1,66 @@
+﻿@model Employee
+@{
+    ViewBag.Title = "Add Employee";
+}
+@section headers { <h2 class="mt-2 mb-2">@ViewBag.Title</h2>}
+
+<form asp-action="AddEmployee" method="post">
+    <div class="row form-group">
+        <label asp-for="FirstName" class="col-sm-2 col-form-label">First Name:</label>
+        <div class="col-sm-4">
+            <input asp-for="FirstName" class="form-control" />
+        </div>
+        <div class="col">
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row form-group">
+        <label asp-for="LastName" class="col-sm-2 col-form-label">Last Name:</label>
+        <div class="col-sm-4">
+            <input asp-for="LastName" class="form-control" />
+        </div>
+        <div class="col">
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row form-group">
+        <label asp-for="DOB" class="col-sm-2 col-form-label">Date of Birth:</label>
+        <div class="col-sm-4">
+            <input asp-for="DOB" class="form-control" />
+        </div>
+        <div class="col">
+            <span asp-validation-for="DOB" type="time" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row form-group">
+        <label asp-for="HireDate" class="col-sm-2 col-form-label">Date of Hire:</label>
+        <div class="col-sm-4">
+            <input asp-for="HireDate" type="text" class="form-control" />
+        </div>
+        <div class="col">
+            <span asp-validation-for="HireDate" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row form-group">
+        <label asp-for="ManagerId" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-4">
+            <select asp-for="ManagerId" class="form-control" asp-items="@(new SelectList(ViewBag.Employees, "EmployeeId", "FullName"))">
+                <option value="0"></option>
+            </select>
+        </div>
+        <div class="col">
+            <span asp-validation-for="ManagerId" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <button type="submit" class="btn btn-dark">Add</button>
+            <a asp-action="Index" asp-controller="Home" class="btn btn-outline-dark">Cancel</a>
+        </div>
+    </div>
+</form>

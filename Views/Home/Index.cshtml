@@ -1,8 +1,51 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model SalesAppViewModel
+
+@{
+    ViewBag.Title = "Quarterly Sales";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@section headers { <h2 class="mt-2 mb-2">@ViewBag.Title</h2>}
+
+<form asp-action="Index" method="post">
+    <div class="form-group row">
+        <label class="col-sm-2 col-form-label">Employee</label>
+
+        <div class="col-sm-4">
+            <select name="EmployeeId" class="form-control" asp-items="@(new SelectList(Model.Employee, "EmployeeId", "FullName", Model.EmployeeId))">
+                <option value="0">All</option>
+            </select>
+        </div>
+
+        <div class="col">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </div>
+</form>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Year</th>
+            <th>Quarter</th>
+            <th>Employee</th>
+            <th>Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Sales sale in Model.Sales)
+            {
+                <tr>
+                    <td>@sale.Year</td>
+                    <td>@sale.Quarter</td>
+                    <td>@sale.Employee.FullName</td>
+                    <td>@sale.Amount?.ToString("C")</td>
+                </tr>
+            }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="3">Total Sales</td>
+            <td>@Model.Sales.Sum(s => s.Amount)?.ToString("C")</td>
+        </tr>
+    </tfoot>
+</table>

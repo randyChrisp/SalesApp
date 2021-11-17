@@ -1,37 +1,62 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using SalesApp.Models;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using SalesApp.Models;
 
 namespace SalesApp.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private SalesAppContext context { get; set; }
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(SalesAppContext ctx)
         {
-            _logger = logger;
+            context = ctx;
         }
 
-        public IActionResult Index()
+        [HttpGet]
+        public ViewResult Index(int id)
         {
-            return View();
-        }
+            IQueryable<Sales> query = context.SalesDb
+                .Include(s => s.Employee)
+                .OrderBy(s => s.Employee.LastName)
+                .ThenBy(s => s.Employee.FirstName)
+                .ThenBy(s => s.Year)
+                .ThenBy(s => s.Quarter);
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+            if(id > 0)
+            {
+                query = query.Where(s => s.EmployeeId == id);
+            }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+            SalesAppViewModel viewModel = new SalesAppViewModel
+            {
+                Sales = query.ToList(),
+                Employee = context.Employees
+                .OrderBy(e => e.LastName)
+                .ThenBy(e => e.FirstName)
+                .ToList(),
+                EmployeeId = id
+            };
+
+            return View(viewModel);            
+        }
+        
+        [HttpPost]
+        public RedirectToActionResult Index(Employee employee)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            if(employee.EmployeeId > 0)
+            {
+                return RedirectToAction("Index", new { id = employee.EmployeeId });
+            }
+            else
+            {
+                return RedirectToAction("Index", new { id = string.Empty });
+            }
         }
     }
 }
