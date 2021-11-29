@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using SalesApp.Models.Validation;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +24,7 @@ namespace SalesApp.Models
 
         [Required(ErrorMessage = "Please enter a date of birth.")]
         [PastDate(ErrorMessage = "Please enter a date of birth in the past.")]
-        [Range(typeof(DateTime), "1/1/1900", "12/31/9999", ErrorMessage = "Date of birth must be after 1/1/1900.")]
+        [Remote("ValidateEmployee", "Validation", AdditionalFields = "FirstName, LastName")]
         [Display(Name = "Birth Date")]
         public DateTime? DOB { get; set; }
 
@@ -34,6 +35,7 @@ namespace SalesApp.Models
         public DateTime? HireDate { get; set; }
 
         [AfterDate(0, ErrorMessage = "Please choose a manager.")]
+        [Remote("EmployeeManagerMatch", "Validation", AdditionalFields = "FirstName, LastName, DOB")]
         [Display(Name = "Manager")]
         public int ManagerId { get; set; }
 

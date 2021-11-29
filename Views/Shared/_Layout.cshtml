@@ -22,7 +22,11 @@
         <header class="text-left text-dark p-4 mb-4">
             @RenderSection("headers", true)
         </header>
-        <main role="main">
+        <main role="main" class="pb-3">
+            @if (TempData.Keys.Contains("message"))
+            {
+                <h2 class="bg-light text-center p-2 mb-2">@TempData["message"]</h2>
+            }
             @RenderBody()
         </main>
     </div>

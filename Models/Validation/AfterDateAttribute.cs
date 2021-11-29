@@ -18,6 +18,7 @@ namespace SalesApp.Models.Validation
             {
                 int checkDate = (int)value;
                 int dateToCompare = (int)valueDate;
+
                 if(checkDate > dateToCompare)
                 {
                     return ValidationResult.Success;
@@ -35,7 +36,9 @@ namespace SalesApp.Models.Validation
             else if (value is DateTime)
             {
                 DateTime checkDate = (DateTime)value;
-                DateTime dateToCompare = (DateTime)valueDate;
+                DateTime dateToCompare = new DateTime();
+                DateTime.TryParse(valueDate.ToString(), out dateToCompare);
+                
                 if (checkDate > dateToCompare)
                 {
                     return ValidationResult.Success;

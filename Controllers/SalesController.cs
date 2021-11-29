@@ -42,6 +42,7 @@ namespace SalesApp.Controllers
             {
                 context.SalesDb.Add(sales);
                 context.SaveChanges();
+                TempData["message"] = $"Sales added";
                 return RedirectToAction("Index", "Home");
             }
             else

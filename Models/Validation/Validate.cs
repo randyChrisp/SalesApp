@@ -12,12 +12,9 @@ namespace SalesApp.Models.Validation
             Employee confirmEmployee = context.Employees.FirstOrDefault(e=> e.FirstName.ToLower() == employee.FirstName.ToLower() 
             && e.LastName.ToLower() == employee.LastName.ToLower() && e.DOB == employee.DOB);
 
-            if(confirmEmployee == null)
-            {
-                return string.Empty; 
-            }
-
-            return $"{confirmEmployee.FullName} (DOB: {confirmEmployee.DOB?.ToShortDateString()}) is already in the database.";
+            return confirmEmployee == null ? 
+                string.Empty 
+                : $"{confirmEmployee.FullName} (DOB: {confirmEmployee.DOB?.ToShortDateString()}) is already in the database.";
         }
 
         public static string EmployeeManagerMatch(SalesAppContext context, Employee employee)
@@ -44,7 +41,7 @@ namespace SalesApp.Models.Validation
             }
 
             Employee employee = context.Employees.Find(sale.EmployeeId);
-            return $"Sales for{employee.FullName} for {sale.Year} Q{sale.Quarter} are already in the database.";
+            return $"Sales for {employee.FullName} for {sale.Year} Q{sale.Quarter} are already in the database.";
         }
     }
 }

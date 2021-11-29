@@ -39,6 +39,7 @@ namespace SalesApp.Controllers
             }
 
             message = Validate.EmployeeManagerMatch(context, employee);
+            if (!string.IsNullOrEmpty(message))
             {
                 ModelState.AddModelError(nameof(Employee.ManagerId), message);
             }
@@ -47,6 +48,7 @@ namespace SalesApp.Controllers
             {
                 context.Employees.Add(employee);
                 context.SaveChanges();
+                TempData["message"] = $"Added {employee.FullName}";
                 return RedirectToAction("Index", "Home");
             }
             else

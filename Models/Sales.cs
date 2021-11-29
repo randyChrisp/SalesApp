@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using SalesApp.Models.Validation;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +13,10 @@ namespace SalesApp.Models
         public int SalesId { get; set; }
 
         [AfterDate(0, ErrorMessage = "Please choose an employee.")]
+        [Remote("ConfirmSales", "Validation", AdditionalFields = "Quarter, Year")]
         [Display(Name ="Employee")]
         public int EmployeeId { get; set; }
 
-        [Required(ErrorMessage = "Please enter the employee.")]
         public Employee Employee { get; set; }
 
         [Required(ErrorMessage = "Please enter a quarter.")]
