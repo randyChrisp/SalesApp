@@ -3,15 +3,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SalesApp.Models.Validation;
 using SalesApp.Models;
 
 namespace SalesApp.Controllers
 {
     public class ValidationController : Controller
     {
-        private SalesAppContext context { get; set; }
-        public ValidationController(SalesAppContext ctx) => context = ctx;
+        private UnitOfWork data { get; set; }
+        public ValidationController(SalesAppContext ctx)
+        {
+            this.data = new UnitOfWork(ctx);
+        }
 
         public JsonResult ValidateEmployee(string firstName, string lastName, DateTime dob)
         {
@@ -22,7 +24,7 @@ namespace SalesApp.Controllers
                 DOB = dob
             };
 
-            string message = Validate.ValidateEmployee(context, employee);
+            string message = Validate.ValidateEmployee(data.Employees, employee);
             if (string.IsNullOrEmpty(message))
             {
                 return Json(true);
@@ -41,7 +43,7 @@ namespace SalesApp.Controllers
                 DOB = dob
             };
 
-            string message = Validate.EmployeeManagerMatch(context, employee);
+            string message = Validate.EmployeeManagerMatch(data.Employees, employee);
             if (string.IsNullOrEmpty(message))
             {
                 return Json(true);
@@ -59,7 +61,7 @@ namespace SalesApp.Controllers
                 Quarter = quarter
             };
 
-            string message = Validate.ConfirmSales(context, sale);
+            string message = Validate.ConfirmSales(data, sale);
             if (string.IsNullOrEmpty(message))
             {
                 return Json(true);

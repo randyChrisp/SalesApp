@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
-using SalesApp.Models;
 using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;    // add this
+using SalesApp.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +31,10 @@ namespace SalesApp
                 options.AppendTrailingSlash = true;
             });
 
-            services.AddControllersWithViews();
+            services.AddMemoryCache();
+            services.AddSession();
+
+            services.AddControllersWithViews().AddNewtonsoftJson();
 
             services.AddDbContext<SalesAppContext>(options =>
             options.UseSqlServer(
@@ -44,12 +47,17 @@ namespace SalesApp
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+            app.UseSession();
+
             app.UseRouting();
 
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllerRoute(
+                    name: "pagesortfilter",
+                    pattern: "{controller=Home}/{action=Index}/page/{pagenumber}/size/{pagesize}/sort/{sortfield}/{sortdirection}/filterby/employee-{employee}/year-{year}/qtr-{quarter}");
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");

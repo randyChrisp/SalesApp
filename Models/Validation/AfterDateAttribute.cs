@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 
-namespace SalesApp.Models.Validation
+namespace SalesApp.Models
 {
     public class AfterDateAttribute : ValidationAttribute
     {

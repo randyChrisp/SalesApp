@@ -14,7 +14,7 @@
 <body>
     <div class="container">
         <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
-            <a class="nav-link @(controller == "Home" && action == "Index" ? "active" : "")" asp-controller="Home" asp-action="Index">Home</a>
+            <a class="nav-link @(controller == "Home" && action == "Index" ? "active" : "")" asp-controller="Home" asp-action="Clear">Home</a>
             <a class="nav-link @(controller == "Sales" && action == "AddSales" ? "active" : "")" asp-controller="Sales" asp-action="AddSales">Add Sales</a>
             <a class="nav-link @(controller == "Employee" && action == "AddEmployee" ? "active" : "")" asp-controller="Employee" asp-action="AddEmployee">Add Employee</a>
         </nav>

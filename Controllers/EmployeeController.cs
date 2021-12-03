@@ -4,17 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SalesApp.Models;
-using SalesApp.Models.Validation;
 
 namespace SalesApp.Controllers
 {
     public class EmployeeController : Controller
     {
-        private SalesAppContext context { get; set; }
+        public Repository<Employee> data { get; set; }
 
         public EmployeeController(SalesAppContext ctx)
         {
-            context = ctx;
+            this.data = new Repository<Employee>(ctx);
         }
 
         public IActionResult Index()
@@ -25,20 +24,20 @@ namespace SalesApp.Controllers
         [HttpGet]
         public ViewResult AddEmployee()
         {
-            ViewBag.Employees = context.Employees.OrderBy(e => e.LastName).ThenBy(e => e.FirstName).ToList();
+            ViewBag.Employees = data.List(new QueryOptions<Employee> { OrderBy = e => e.FirstName});
             return View();
         }
         
         
         public IActionResult AddEmployee(Employee employee)
         {
-            string message = Validate.ValidateEmployee(context, employee);
+            string message = Validate.ValidateEmployee(data, employee);
             if(!string.IsNullOrEmpty(message))
             {
                 ModelState.AddModelError(nameof(Employee.DOB), message);
             }
 
-            message = Validate.EmployeeManagerMatch(context, employee);
+            message = Validate.EmployeeManagerMatch(data, employee);
             if (!string.IsNullOrEmpty(message))
             {
                 ModelState.AddModelError(nameof(Employee.ManagerId), message);
@@ -46,14 +45,15 @@ namespace SalesApp.Controllers
 
             if(ModelState.IsValid)
             {
-                context.Employees.Add(employee);
-                context.SaveChanges();
+                data.Insert(employee);
+                data.Save();
+
                 TempData["message"] = $"Added {employee.FullName}";
                 return RedirectToAction("Index", "Home");
             }
             else
             {
-                ViewBag.Employees = context.Employees.OrderBy(e => e.LastName).ThenBy(e => e.FirstName).ToList();
+                ViewBag.Employees = data.List(new QueryOptions<Employee> { OrderBy = e => e.FirstName });
                 return View();
             }
         }

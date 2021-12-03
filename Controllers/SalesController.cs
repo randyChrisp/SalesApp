@@ -4,17 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using SalesApp.Models;
-using SalesApp.Models.Validation;
 
 namespace SalesApp.Controllers
 {
     public class SalesController : Controller
     {
-        private SalesAppContext context { get; set; }
+        private UnitOfWork data { get; set; }
 
         public SalesController(SalesAppContext ctx)
         {
-            context = ctx;
+            this.data = new UnitOfWork(ctx);
         }
 
         public IActionResult Index()
@@ -25,14 +24,14 @@ namespace SalesApp.Controllers
         [HttpGet]
         public ViewResult AddEmployee()
         {
-            ViewBag.Employees = context.Employees.OrderBy(e => e.LastName).ThenBy(e => e.FirstName).ToList();
+            ViewBag.Employees = data.Employees.List(new QueryOptions<Employee> { OrderBy = e => e.FirstName });
             return View();
         }
 
         
         public IActionResult AddSales(Sales sales)
         {
-            string message = Validate.ConfirmSales(context, sales);
+            string message = Validate.ConfirmSales(data, sales);
             if (!string.IsNullOrEmpty(message))
             {
                 ModelState.AddModelError(nameof(sales.EmployeeId), message);
@@ -40,14 +39,15 @@ namespace SalesApp.Controllers
 
             if (ModelState.IsValid)
             {
-                context.SalesDb.Add(sales);
-                context.SaveChanges();
+                data.Sales.Insert(sales);
+                data.Save();
+                
                 TempData["message"] = $"Sales added";
                 return RedirectToAction("Index", "Home");
             }
             else
             {
-                ViewBag.Employees = context.Employees.OrderBy(e => e.LastName).ThenBy(e => e.FirstName).ToList();
+                ViewBag.Employees = data.Employees.List(new QueryOptions<Employee> { OrderBy = e => e.FirstName });
                 return View();
             }
         }

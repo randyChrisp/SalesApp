@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using SalesApp.Models.Validation;
+using SalesApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;

@@ -11,52 +11,63 @@ namespace SalesApp.Controllers
 {
     public class HomeController : Controller
     {
-        private SalesAppContext context { get; set; }
+        private UnitOfWork data { get; set; }
+
 
         public HomeController(SalesAppContext ctx)
         {
-            context = ctx;
+            this.data = new UnitOfWork(ctx);
         }
 
         [HttpGet]
-        public ViewResult Index(int id)
+        public ViewResult Index(SalesGridDTO values)
         {
-            IQueryable<Sales> query = context.SalesDb
-                .Include(s => s.Employee)
-                .OrderBy(s => s.Employee.LastName)
-                .ThenBy(s => s.Employee.FirstName)
-                .ThenBy(s => s.Year)
-                .ThenBy(s => s.Quarter);
+            string defaultSort = nameof(Sales.Year);
+            var builder = new SalesGridBuilder(HttpContext.Session, values, defaultSort);
 
-            if(id > 0)
+            var options = new SalesQueryOptions
             {
-                query = query.Where(s => s.EmployeeId == id);
-            }
+                Includes = "Employee",
+                OrderByDirection = builder.CurrentRoute.SortDirection,
+                PageNumber = builder.CurrentRoute.PageNumber,
+                PageSize = builder.CurrentRoute.PageSize
+            };
+
+            options.SortFilter(builder);
 
             SalesAppViewModel viewModel = new SalesAppViewModel
             {
-                Sales = query.ToList(),
-                Employee = context.Employees
-                .OrderBy(e => e.LastName)
-                .ThenBy(e => e.FirstName)
-                .ToList(),
-                EmployeeId = id
+                Sales = data.Sales.List(options),
+                Employees = data.Employees.List(new QueryOptions<Employee> { OrderBy = e => e.FirstName}),
+                CurrentRoute = builder.CurrentRoute,
+                TotalPages = builder.GetTotalPages(data.Sales.Count)
             };
 
             return View(viewModel);            
         }
         
         [HttpPost]
-        public RedirectToActionResult Index(Employee employee)
+        public RedirectToActionResult Filter(string[] filter, bool clear = false)
         {
-            if(employee.EmployeeId > 0)
+            var builder = new SalesGridBuilder(HttpContext.Session);
+
+            if(clear)
             {
-                return RedirectToAction("Index", new { id = employee.EmployeeId });
+                builder.ClearFilterSegments();
             }
             else
             {
-                return RedirectToAction("Index", new { id = string.Empty });
+                var employee = data.Employees.Get(filter[0].ToInt());
+                builder.LoadFilterSegments(filter, employee);
             }
+
+            return RedirectToAction("Index", builder.CurrentRoute);
+        }
+
+        [HttpGet]
+        public RedirectToActionResult Clear()
+        {
+            return RedirectToAction("Index", new { });
         }
     }
 }
