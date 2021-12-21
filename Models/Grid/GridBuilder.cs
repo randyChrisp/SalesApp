@@ -1,5 +1,4 @@
 ﻿using System;
-using System;
 using Microsoft.AspNetCore.Http;
 
 namespace SalesApp.Models

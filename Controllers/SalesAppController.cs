@@ -7,11 +7,11 @@ using SalesApp.Models;
 
 namespace SalesApp.Controllers
 {
-    public class SalesController : Controller
+    public class SalesAppController : Controller
     {
         private UnitOfWork data { get; set; }
 
-        public SalesController(SalesAppContext ctx)
+        public SalesAppController(SalesAppContext ctx)
         {
             this.data = new UnitOfWork(ctx);
         }

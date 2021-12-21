@@ -38,20 +38,20 @@ namespace SalesApp.Controllers
             SalesAppViewModel viewModel = new SalesAppViewModel
             {
                 Sales = data.Sales.List(options),
-                Employees = data.Employees.List(new QueryOptions<Employee> { OrderBy = e => e.FirstName}),
+                Employees = data.Employees.List(new QueryOptions<Employee> { OrderBy = e => e.FirstName }),
                 CurrentRoute = builder.CurrentRoute,
                 TotalPages = builder.GetTotalPages(data.Sales.Count)
             };
 
-            return View(viewModel);            
+            return View(viewModel);
         }
-        
+
         [HttpPost]
         public RedirectToActionResult Filter(string[] filter, bool clear = false)
         {
             var builder = new SalesGridBuilder(HttpContext.Session);
 
-            if(clear)
+            if (clear)
             {
                 builder.ClearFilterSegments();
             }

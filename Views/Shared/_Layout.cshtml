@@ -1,27 +1,96 @@
-﻿@{ 
-    string controller = ViewContext.RouteData.Values["controller"].ToString();
-    string action = ViewContext.RouteData.Values["action"].ToString();
+﻿@{
+
+    var current = ViewContext.RouteData.Values["area"]?.ToString() ??
+        ViewContext.RouteData.Values["controller"]?.ToString();
 }
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/custom.css" />
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
-    <div class="container">
-        <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
-            <a class="nav-link @(controller == "Home" && action == "Index" ? "active" : "")" asp-controller="Home" asp-action="Clear">Home</a>
-            <a class="nav-link @(controller == "Sales" && action == "AddSales" ? "active" : "")" asp-controller="Sales" asp-action="AddSales">Add Sales</a>
-            <a class="nav-link @(controller == "Employee" && action == "AddEmployee" ? "active" : "")" asp-controller="Employee" asp-action="AddEmployee">Add Employee</a>
-        </nav>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
-        <header class="text-left text-dark p-4 mb-4">
-            @RenderSection("headers", true)
-        </header>
+                <div class="collapse navbar-collapse" id="menu">
+                    @using Microsoft.AspNetCore.Identity
+                    @inject SignInManager<User> signInManager
+
+
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index" asp-route-id="">Home</a>
+                        </li>
+                        @if (signInManager.IsSignedIn(User))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Sales" asp-action="Add">Add Sales</a>
+                            </li>
+
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Employee" asp-action="Add">Add Employee</a>
+                            </li>
+                        }
+                    </ul>
+
+
+                    <ul class="navbar-nav ml-auto">
+
+                        @if (signInManager.IsSignedIn(User))
+                        {
+                            <a class="text-dark">Welcome, @User.Identity.Name</a>
+
+
+                            <li class="nav-item">
+                                <form method="post" asp-action="LogOut" asp-controller="Account"
+                                      asp-area="">
+                                    <input type="submit" value="Log Out"
+                                           class="btn btn-outline-dark" />
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            var action = ViewContext.RouteData.Values["action"]?.ToString();
+
+                            // anonymous user - Register link and Log In button
+                            <li class="nav-item @Nav.Active("Register", action)">
+                                <a asp-action="Register" asp-controller="Account"
+                                   asp-area="" class="nav-link">
+                                    <span class="fas fa-edit"></span>&nbsp;Register
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-action="Login" asp-controller="Account"
+                                   asp-area="" class="btn btn-outline-dark">Log In</a>
+                            </li>
+                        }
+
+                        <li class="nav-item @Nav.Active("Admin", current)">
+                            <a class="nav-link" asp-action="Index" asp-controller="Book" asp-area="Admin">
+                                <span class="fas fa-cog"></span>&nbsp;Admin
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
         <main role="main" class="pb-3">
             @if (TempData.Keys.Contains("message"))
             {
@@ -30,7 +99,8 @@
             @RenderBody()
         </main>
     </div>
-    <script src="~/lib/jquery/jquery.min.js"></script>
-    @RenderSection("scripts", false)   
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    @RenderSection("scripts", required: false)
 </body>
 </html>
+

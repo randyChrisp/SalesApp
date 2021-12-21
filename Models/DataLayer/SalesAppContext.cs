@@ -1,12 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace SalesApp.Models
 {
-    public class SalesAppContext : DbContext
+    public class SalesAppContext : IdentityDbContext<User>
     {
         public SalesAppContext (DbContextOptions<SalesAppContext> options) : base(options) { }
 
@@ -15,6 +16,8 @@ namespace SalesApp.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<Employee>().HasData(
                 new Employee
                 {
@@ -83,7 +86,34 @@ namespace SalesApp.Models
                     Amount = 529183,
                     EmployeeId = 3
                 }
-                ); ;
+                );
+        }
+
+        public static async Task CreateAdminUser(IServiceProvider serviceProvider)
+        {
+            UserManager<User> userManager =
+                serviceProvider.GetRequiredService<UserManager<User>>();
+            RoleManager<IdentityRole> roleManager =
+                serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+            string username = "admin";
+            string password = "P@ssw0rd";
+            string roleName = "Admin";
+
+            if (await roleManager.FindByNameAsync(roleName) == null)
+            {
+                await roleManager.CreateAsync(new IdentityRole(roleName));
+            }
+
+            if (await userManager.FindByNameAsync(username) == null)
+            {
+                User user = new User { UserName = username };
+                var result = await userManager.CreateAsync(user, password);
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(user, roleName);
+                }
+            }
         }
     }
 }
